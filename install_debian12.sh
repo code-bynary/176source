@@ -28,7 +28,7 @@ apt-get install -y git
 apt-get install -y build-essential cmake gcc g++ make \
     libxml2-dev libssl-dev libpcre3-dev zlib1g-dev \
     libmariadb-dev-compat libmariadb-dev libreadline-dev \
-    ant default-jdk
+    ant default-jdk dos2unix
 
 # 3. Clone Repository
 REPO_DIR="/root/176source"
@@ -54,9 +54,16 @@ if [ -d "share" ]; then
     cp -r share /root/
 fi
 
-# 5. Fix Permissions
+# 5. Fix Permissions and Line Endings
+dos2unix -v build.sh install_debian12.sh
 chmod +x build.sh
-chmod +x cnet/rpcgen
+
+# Ensure rpcgen is executable in share directory (source of symlink)
+if [ -f "/root/share/rpcgen" ]; then
+    echo -e "${GREEN}[+] Fixing rpcgen permissions...${NC}"
+    chmod +x /root/share/rpcgen
+    dos2unix /root/share/rpcgen
+fi
 
 # 6. Build
 echo -e "${GREEN}[+] Starting Build Process...${NC}"
