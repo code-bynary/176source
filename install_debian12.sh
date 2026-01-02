@@ -19,10 +19,15 @@ fi
 # 2. Install Dependencies
 echo -e "${GREEN}[+] Installing Dependencies...${NC}"
 apt-get update
+
+# Install Git first to ensure cloning works
+apt-get install -y git
+
 # Debian 12 dependencies for C++20 build
-apt-get install -y git build-essential cmake gcc g++ make \
+# Note: libmysqlclient-dev is replaced by libmariadb-dev-compat on Debian 12
+apt-get install -y build-essential cmake gcc g++ make \
     libxml2-dev libssl-dev libpcre3-dev zlib1g-dev \
-    libmysqlclient-dev libreadline-dev
+    libmariadb-dev-compat libmariadb-dev libreadline-dev
 
 # 3. Clone Repository
 REPO_DIR="/root/176source"
