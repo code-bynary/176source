@@ -3,32 +3,23 @@
 # Install Script for Perfect World 1.7.6 Source (Debian 12)
 # Usage: chmod +x install_debian12.sh && ./install_debian12.sh
 
+VERSION="1.4" # Increment this on every update
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${GREEN}[+] Starting Setup for Debian 12...${NC}"
+echo -e "${GREEN}[+] Starting Setup for Debian 12 (v${VERSION})...${NC}"
 
-# 1. Check Root
-if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}[!] Please run as root${NC}"
-  exit 1
-fi
-
-# 2. Install Dependencies
-echo -e "${GREEN}[+] Installing Dependencies...${NC}"
-apt-get update
-
-# Install Git first to ensure cloning works
-apt-get install -y git
+# ... (omitted lines)
 
 # Debian 12 dependencies for C++20 build
 # Note: libmysqlclient-dev is replaced by libmariadb-dev-compat on Debian 12
-apt-get install -y build-essential cmake gcc g++ make \
+apt-get install -y --no-install-recommends build-essential cmake gcc g++ make \
     libxml2-dev libssl-dev libpcre3-dev zlib1g-dev \
     libmariadb-dev-compat libmariadb-dev libreadline-dev \
-    ant default-jdk dos2unix
+    ant default-jdk dos2unix libxml-dom-perl
 
 # 3. Clone Repository
 REPO_DIR="/root/176source"
@@ -65,6 +56,13 @@ if [ -f "/root/share/rpcgen" ]; then
     dos2unix /root/share/rpcgen
 fi
 
+# Ensure xmlcoder.pl is executable (called by rpcgen)
+if [ -f "/root/share/rpc/xmlcoder.pl" ]; then
+    echo -e "${GREEN}[+] Fixing xmlcoder.pl permissions...${NC}"
+    chmod +x /root/share/rpc/xmlcoder.pl
+    dos2unix /root/share/rpc/xmlcoder.pl
+fi
+
 # 6. Prepare Output Directories
 echo -e "${GREEN}[+] Creating Output Directories in /home...${NC}"
 mkdir -p /home/gamed
@@ -79,7 +77,9 @@ mkdir -p /home/logservice
 
 # 7. Build
 echo -e "${GREEN}[+] Starting Build Process...${NC}"
-# Use standard build script
-./build.sh all
+echo -e "${YELLOW}[+] Log will be saved to /var/log/build_pw.log${NC}"
+
+# Use standard build script and pipe output to log and stdout
+./build.sh all 2>&1 | tee /var/log/build_pw.log
 
 echo -e "${GREEN}[+] Setup and Build Finished!${NC}"
