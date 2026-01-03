@@ -187,7 +187,11 @@ buildgame()
 	echo ""
 	echo "======================= build cgame ========================="
 	echo ""
-	cd ~/cgame
+	echo ""
+	echo "======================= build cgame ========================="
+	echo ""
+	# Use relative path instead of hardcoded home
+	cd $GS
 #	cvs up
 	make clean
 	make -j32	
@@ -200,7 +204,10 @@ buildtask()
 	echo ""
 	echo "======================= build libtask.o ========================="
 	echo ""
-	cd ~/
+	echo ""
+	echo "======================= build libtask.o ========================="
+	echo ""
+	# Removing 'cd ~/' to use relative path
 	cd $GS
 	cd gs
 	cd task
@@ -282,6 +289,7 @@ builddeliver() # Ç°¸úrpcgen
 	echo ""
 	cd gfaction
 	make clean
+	if [ -d "operations" ]; then cp operations/*.h . 2>/dev/null; cp operations/*.hxx . 2>/dev/null; cp operations/*.cxx . 2>/dev/null; fi
 	make -j32
 	cd ..
 	
